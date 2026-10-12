@@ -36,3 +36,6 @@ jobs:
 
       - name: Compilar solucao
         run: dotnet build StarlinkSystem.sln --configuration Release --no-restore
+
+      - name: Executar testes automatizados
+        run: dotnet test Tests/Starlink.Api.Tests/Starlink.Api.Tests.csproj --configuration Release --no-build
