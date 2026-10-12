@@ -1,0 +1,38 @@
+@page "/registrar"
+@layout EmptyLayout
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+@inject IConfiguration Config
+
+<PageTitle>Criar conta | StarLink Rental</PageTitle>
+<section class="login-page">
+    <div class="login-card">
+        <div class="brand brand-center"><div class="brand-icon">S</div><div><strong>StarLink</strong><span>Rental</span></div></div>
+        <div class="login-header"><h1>Criar conta</h1><p>Cadastre o responsável pela conta.</p></div>
+        <EditForm Model="model" OnValidSubmit="RegistrarAsync" FormName="RegistrarForm">
+            <input type="hidden" name="__formname" value="RegistrarForm" />
+            <DataAnnotationsValidator />
+            <div class="form-group"><label for="nome">Nome</label><InputText id="nome" class="form-input" @bind-Value="model.Nome" placeholder="Seu nome" /><ValidationMessage For="@(() => model.Nome)" /></div>
+            <div class="form-group"><label for="email">E-mail</label><InputText id="email" class="form-input" type="email" @bind-Value="model.Email" placeholder="seu@email.com" /><ValidationMessage For="@(() => model.Email)" /></div>
+            <div class="form-group"><label for="senha">Senha</label><InputText id="senha" class="form-input" type="password" @bind-Value="model.Senha" placeholder="Mínimo de 6 caracteres" /><ValidationMessage For="@(() => model.Senha)" /></div>
+            @if (!string.IsNullOrWhiteSpace(erro)) { <div class="alert alert-error">@erro</div> }
+            <button type="submit" class="btn btn-primary btn-full" disabled="@carregando">@(carregando ? "Criando conta..." : "Criar conta")</button>
+        </EditForm>
+        @if (Config.GetValue<bool>("UseMockData")) { <p class="demo-note">No modo demonstração, a conta existe somente durante a sessão atual.</p> }
+        <p class="login-footer"><a href="/login">Já tenho uma conta · Voltar ao login</a></p>
+    </div>
+</section>
+@code {
+    private RegistroRequest model = new();
+    private string erro = "";
+    private bool carregando;
+    protected override void OnInitialized() { if (Session.IsAuthenticated) Nav.NavigateTo("/dashboard"); }
+    private async Task RegistrarAsync()
+    {
+        carregando = true; erro = "";
+        try { await Service.RegisterAsync(model); Nav.NavigateTo("/dashboard"); }
+        catch (Exception ex) { erro = ex.Message; }
+        finally { carregando = false; }
+    }
+}

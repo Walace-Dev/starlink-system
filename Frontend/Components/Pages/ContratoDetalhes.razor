@@ -1,0 +1,77 @@
+@page "/contratos/{Id:int}"
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>Detalhes do contrato | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>Registro #@Id.ToString("D6")</h1><p>Detalhes e atualização do registro.</p></div><button class="btn btn-secondary" @onclick="Voltar">← Voltar</button></div>
+    @if (!string.IsNullOrWhiteSpace(mensagem)) { <div class="alert @(erro ? "alert-error" : "alert-success")">@mensagem</div> }
+    @if (carregando) { <div class="loading-card">Carregando registro...</div> }
+    else if (registro is null) { <div class="content-card padded"><h3>Registro não encontrado</h3><p>O contrato pode ter sido removido ou não estar disponível.</p></div> }
+    else {
+        <div class="details-grid">
+            <div class="content-card"><div class="card-header"><h3>Informações do registro</h3><span class="status @ClasseStatus(registro.Status)">@TextoStatus(registro.Status)</span></div>
+                <div class="details-list"><div><span>ID</span><strong>#@registro.Id.ToString("D6")</strong></div><div><span>Tipo</span><strong>@(registro.DataFimAluguel.HasValue ? "Aluguel" : "Venda")</strong></div><div><span>Valor</span><strong>@Moeda(registro.Valor)</strong></div><div><span>Data de início</span><strong>@registro.DataInicioAluguel.ToString("dd/MM/yyyy")</strong></div><div><span>Data de fim</span><strong>@(registro.DataFimAluguel?.ToString("dd/MM/yyyy") ?? "Não se aplica")</strong></div><div><span>Criado em</span><strong>@registro.DataVenda.ToLocalTime().ToString("dd/MM/yyyy")</strong></div><div><span>Observação</span><strong>@(string.IsNullOrWhiteSpace(registro.Observacao) ? "—" : registro.Observacao)</strong></div></div>
+            </div>
+            <div class="content-card"><div class="card-header"><h3>Cliente</h3></div><div class="client-profile"><div class="avatar large">@Iniciais(registro.Cliente?.Nome ?? "Cliente")</div><h3>@(registro.Cliente?.Nome ?? "Cliente não carregado")</h3><p>@(registro.Cliente?.Email ?? "Sem e-mail cadastrado")</p><p>@(registro.Cliente?.Telefone ?? "Sem telefone cadastrado")</p><p>CPF/CNPJ: @FormatarDocumento(registro.Cliente?.Documento)</p><p>@(registro.Cliente?.Endereco ?? "Sem endereço cadastrado")</p><button class="btn btn-secondary" @onclick="EditarCliente">Editar cliente</button></div></div>
+        </div>
+        <div class="content-card status-card"><div><h3>Atualizar status</h3><p>Altere o status atual deste registro.</p></div><InputSelect class="form-input status-select" @bind-Value="statusNovo"><option value="Ativa">Ativa</option><option value="Finalizada">Finalizada</option><option value="Cancelada">Cancelada</option></InputSelect><button class="btn btn-primary" @onclick="AtualizarStatusAsync" disabled="@salvando">@(salvando ? "Atualizando..." : "Atualizar status")</button></div>
+        <div class="danger-zone"><div><strong>Excluir registro</strong><p>Essa ação remove o registro permanentemente do banco/API ou da sessão de demonstração.</p></div><button class="btn btn-danger" @onclick="ExcluirAsync" disabled="@salvando">Excluir</button></div>
+    }
+</section>
+@code {
+    [Parameter] public int Id { get; set; }
+    private VendaDto? registro;
+    private StatusVenda statusNovo;
+    private bool carregando = true;
+    private bool salvando;
+    private bool erro;
+    private string mensagem = "";
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsAuthenticated) { Nav.NavigateTo("/login"); return; }
+        try
+        {
+            var vendas = await Service.GetVendasAsync();
+            registro = vendas.FirstOrDefault(v => v.Id == Id);
+            if (registro is not null)
+            {
+                var clientes = await Service.GetClientesAsync();
+                registro.Cliente ??= clientes.FirstOrDefault(c => c.Id == registro.ClienteId);
+                statusNovo = registro.Status;
+            }
+        }
+        catch (Exception ex) { mensagem = ex.Message; erro = true; }
+        finally { carregando = false; }
+    }
+    private async Task AtualizarStatusAsync()
+    {
+        if (registro is null) return;
+        salvando = true; mensagem = "";
+        try { await Service.UpdateStatusAsync(registro.Id, statusNovo); registro.Status = statusNovo; mensagem = "Status atualizado com sucesso."; erro = false; }
+        catch (Exception ex) { mensagem = ex.Message; erro = true; }
+        finally { salvando = false; }
+    }
+    private async Task ExcluirAsync()
+    {
+        if (registro is null) return;
+        salvando = true;
+        try { await Service.DeleteVendaAsync(registro.Id); Nav.NavigateTo(registro.DataFimAluguel.HasValue ? "/alugueis" : "/vendas"); }
+        catch (Exception ex) { mensagem = ex.Message; erro = true; }
+        finally { salvando = false; }
+    }
+    private void Voltar() => Nav.NavigateTo(registro?.DataFimAluguel.HasValue == true ? "/alugueis" : "/vendas");
+    private void EditarCliente() { if (registro is not null) Nav.NavigateTo($"/clientes/editar/{registro.ClienteId}"); }
+    private static string Moeda(decimal v) => v.ToString("C", CultureInfo.GetCultureInfo("pt-BR"));
+    private static string TextoStatus(StatusVenda s) => s switch { StatusVenda.Ativa => "Ativa", StatusVenda.Finalizada => "Finalizada", _ => "Cancelada" };
+    private static string ClasseStatus(StatusVenda s) => s switch { StatusVenda.Ativa => "active", StatusVenda.Finalizada => "finished", _ => "cancelled" };
+    private static string Iniciais(string nome) => string.Concat(nome.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => char.ToUpperInvariant(x[0])));
+    private static string FormatarDocumento(string? value)
+    {
+        var d = new string((value ?? "").Where(char.IsDigit).ToArray());
+        if (d.Length == 11) return d[..3] + "." + d.Substring(3, 3) + "." + d.Substring(6, 3) + "-" + d[9..];
+        if (d.Length == 14) return d[..2] + "." + d.Substring(2, 3) + "." + d.Substring(5, 3) + "/" + d.Substring(8, 4) + "-" + d[12..];
+        return string.IsNullOrWhiteSpace(value) ? "—" : value;
+    }
+}

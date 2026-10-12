@@ -1,0 +1,19 @@
+@page "/configuracoes"
+@inject AuthSession Session
+@inject IConfiguration Config
+@inject NavigationManager Nav
+
+<PageTitle>Configurações | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>Configurações</h1><p>Informações do ambiente de execução e da conta.</p></div></div>
+    <div class="settings-grid">
+        <div class="content-card settings-card"><div class="card-header"><div><h3>Ambiente da aplicação</h3><p>Como os dados estão sendo carregados nesta execução.</p></div></div><div class="settings-body">
+            <div class="setting-row"><div><strong>Modo atual</strong><p>@(Config.GetValue<bool>("UseMockData") ? "Demonstração sem banco de dados" : "API C# real")</p></div><span class="status @(Config.GetValue<bool>("UseMockData") ? "pending" : "active")">@(Config.GetValue<bool>("UseMockData") ? "MOCK" : "API")</span></div>
+            <div class="setting-row"><div><strong>URL da API</strong><p>@(Config["ApiBaseUrl"] ?? "Não configurada")</p></div></div>
+            @if (Config.GetValue<bool>("UseMockData")) { <div class="alert alert-info">Os cadastros, edições e exclusões funcionam em memória durante a sessão. Ao reiniciar ou atualizar a aplicação, os dados de demonstração voltam ao estado inicial.</div> }
+            else { <div class="alert alert-info">O frontend está configurado para chamar a API real. O backend precisa estar em execução e o banco/migrations configurados para que os dados persistam.</div> }
+        </div></div>
+        <div class="content-card settings-card"><div class="card-header"><div><h3>Conta conectada</h3><p>Usuário atualmente autenticado.</p></div></div><div class="settings-body"><div class="setting-row"><div><strong>Nome</strong><p>@Session.Nome</p></div></div><div class="setting-row"><div><strong>E-mail</strong><p>@Session.Email</p></div></div><div class="setting-row"><div><strong>Autenticação</strong><p>@(Session.IsDemo ? "Sessão de demonstração" : "Token JWT do backend")</p></div></div><button class="btn btn-secondary" @onclick="Sair">Sair da conta</button></div></div>
+    </div>
+</section>
+@code { private void Sair() { Session.SignOut(); Nav.NavigateTo("/login"); } }

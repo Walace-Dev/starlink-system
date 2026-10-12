@@ -1,0 +1,40 @@
+@page "/alugueis"
+@page "/vendas"
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>@(EhVenda ? "Vendas" : "Aluguéis") | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>@(EhVenda ? "Vendas" : "Aluguéis")</h1><p>@(EhVenda ? "Gerencie as vendas de equipamentos Starlink." : "Acompanhe contratos, períodos e status dos aluguéis.")</p></div><button class="btn btn-primary" @onclick="Novo">+ @(EhVenda ? "Nova venda" : "Novo aluguel")</button></div>
+    @if (!string.IsNullOrWhiteSpace(mensagem)) { <div class="alert @(erro ? "alert-error" : "alert-success")">@mensagem</div> }
+    <div class="toolbar"><div class="search-box"><span>🔎</span><input type="search" placeholder="Buscar por cliente ou ID..." @bind="busca" @bind:event="oninput" /></div><select @bind="filtroStatus" aria-label="Filtrar por status"><option value="Todos">Todos os status</option><option value="Ativa">Ativa</option><option value="Finalizada">Finalizada</option><option value="Cancelada">Cancelada</option></select></div>
+    @if (carregando) { <div class="loading-card">Carregando registros...</div> }
+    else {
+        <div class="content-card"><div class="card-header"><div><h3>@(EhVenda ? "Vendas registradas" : "Contratos de aluguel")</h3><p>@Filtrados.Count registro(s) encontrado(s).</p></div></div>
+        <div class="table-container"><table><thead><tr><th>ID</th><th>Cliente</th><th>Valor</th><th>Data início</th><th>@(EhVenda ? "Tipo" : "Data fim")</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+        @foreach (var v in Filtrados) { <tr><td>#@v.Id.ToString("D6")</td><td>@(v.Cliente?.Nome ?? NomeCliente(v.ClienteId))</td><td>@Moeda(v.Valor)</td><td>@v.DataInicioAluguel.ToString("dd/MM/yyyy")</td><td>@(EhVenda ? "Venda" : v.DataFimAluguel?.ToString("dd/MM/yyyy") ?? "—")</td><td><span class="status @ClasseStatus(v.Status)">@TextoStatus(v.Status)</span></td><td><div class="action-group"><button class="btn btn-small" @onclick="() => Detalhes(v.Id)">Detalhes</button><button class="btn btn-small btn-danger-outline" @onclick="() => ExcluirAsync(v)">Excluir</button></div></td></tr> }
+        @if (Filtrados.Count == 0) { <tr><td colspan="7" class="empty-cell">Nenhum registro encontrado.</td></tr> }
+        </tbody></table></div></div>
+    }
+</section>
+@code {
+    private List<VendaDto> vendas = [];
+    private List<ClienteDto> clientes = [];
+    private string busca = "";
+    private string filtroStatus = "Todos";
+    private string mensagem = "";
+    private bool erro;
+    private bool carregando = true;
+    private bool EhVenda => Nav.ToBaseRelativePath(Nav.Uri).TrimEnd('/').StartsWith("vendas", StringComparison.OrdinalIgnoreCase);
+    private List<VendaDto> Filtrados => vendas.Where(v => (EhVenda ? !v.DataFimAluguel.HasValue : v.DataFimAluguel.HasValue) && (filtroStatus == "Todos" || v.Status.ToString() == filtroStatus) && (string.IsNullOrWhiteSpace(busca) || $"{v.Id} {v.Cliente?.Nome} {NomeCliente(v.ClienteId)}".Contains(busca, StringComparison.OrdinalIgnoreCase))).ToList();
+    protected override async Task OnInitializedAsync() { if (!Session.IsAuthenticated) { Nav.NavigateTo("/login"); return; } await CarregarAsync(); }
+    private async Task CarregarAsync() { try { clientes = await Service.GetClientesAsync(); vendas = await Service.GetVendasAsync(); foreach (var v in vendas) v.Cliente ??= clientes.FirstOrDefault(c => c.Id == v.ClienteId); } catch (Exception ex) { mensagem = ex.Message; erro = true; } finally { carregando = false; } }
+    private void Novo() => Nav.NavigateTo(EhVenda ? "/vendas/nova" : "/alugueis/novo");
+    private void Detalhes(int id) => Nav.NavigateTo($"/contratos/{id}");
+    private async Task ExcluirAsync(VendaDto v) { try { await Service.DeleteVendaAsync(v.Id); vendas.RemoveAll(x => x.Id == v.Id); mensagem = "Registro excluído."; erro = false; } catch (Exception ex) { mensagem = ex.Message; erro = true; } }
+    private string NomeCliente(int id) => clientes.FirstOrDefault(c => c.Id == id)?.Nome ?? $"Cliente #{id}";
+    private static string Moeda(decimal v) => v.ToString("C", CultureInfo.GetCultureInfo("pt-BR"));
+    private static string TextoStatus(StatusVenda s) => s switch { StatusVenda.Ativa => "Ativa", StatusVenda.Finalizada => "Finalizada", _ => "Cancelada" };
+    private static string ClasseStatus(StatusVenda s) => s switch { StatusVenda.Ativa => "active", StatusVenda.Finalizada => "finished", _ => "cancelled" };
+}

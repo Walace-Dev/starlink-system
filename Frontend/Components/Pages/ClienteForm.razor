@@ -1,0 +1,53 @@
+@page "/clientes/novo"
+@page "/clientes/editar/{Id:int}"
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>@(Id == 0 ? "Novo cliente" : "Editar cliente") | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>@(Id == 0 ? "Novo cliente" : "Editar cliente")</h1><p>Preencha os dados para @(Id == 0 ? "cadastrar" : "atualizar") o cliente.</p></div><button class="btn btn-secondary" @onclick="Voltar">← Voltar</button></div>
+    @if (!string.IsNullOrWhiteSpace(erro)) { <div class="alert alert-error">@erro</div> }
+    @if (carregando) { <div class="loading-card">Carregando dados...</div> }
+    else {
+        <div class="form-card">
+            <EditForm Model="model" OnValidSubmit="SalvarAsync" FormName="ClienteForm">
+            <input type="hidden" name="__formname" value="ClienteForm" />
+                <DataAnnotationsValidator />
+                <div class="form-section"><h3>Dados pessoais</h3><div class="form-grid">
+                    <div class="form-group span-2"><label for="nome">Nome completo *</label><InputText id="nome" class="form-input" @bind-Value="model.Nome" placeholder="Digite o nome completo" /><ValidationMessage For="@(() => model.Nome)" /></div>
+                    <div class="form-group"><label for="email">E-mail</label><InputText id="email" class="form-input" type="email" @bind-Value="model.Email" placeholder="cliente@email.com" /><ValidationMessage For="@(() => model.Email)" /></div>
+                    <div class="form-group"><label for="telefone">Telefone</label><InputText id="telefone" class="form-input" @bind-Value="model.Telefone" placeholder="(00) 00000-0000" /></div>
+                    <div class="form-group span-2"><label for="documento">CPF/CNPJ *</label><InputText id="documento" class="form-input" @bind-Value="model.Documento" placeholder="Digite somente números ou com pontuação" /><ValidationMessage For="@(() => model.Documento)" /><small class="field-hint">O backend valida o documento ao salvar no modo API.</small></div>
+                </div></div>
+                <div class="form-section"><h3>Endereço</h3><div class="form-grid"><div class="form-group span-2"><label for="endereco">Endereço completo</label><InputText id="endereco" class="form-input" @bind-Value="model.Endereco" placeholder="Rua, número, bairro, cidade e UF" /></div></div></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" @onclick="Voltar">Cancelar</button><button type="submit" class="btn btn-primary" disabled="@salvando">@(salvando ? "Salvando..." : "Salvar cliente")</button></div>
+            </EditForm>
+        </div>
+    }
+</section>
+@code {
+    [Parameter] public int Id { get; set; }
+    private ClienteDto model = new();
+    private string erro = "";
+    private bool carregando = true;
+    private bool salvando;
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsAuthenticated) { Nav.NavigateTo("/login"); return; }
+        if (Id > 0)
+        {
+            try { model = await Service.GetClienteAsync(Id) ?? throw new InvalidOperationException("Cliente não encontrado."); }
+            catch (Exception ex) { erro = ex.Message; }
+        }
+        carregando = false;
+    }
+    private async Task SalvarAsync()
+    {
+        erro = ""; salvando = true;
+        try { await Service.SaveClienteAsync(model); Nav.NavigateTo("/clientes"); }
+        catch (Exception ex) { erro = ex.Message; }
+        finally { salvando = false; }
+    }
+    private void Voltar() => Nav.NavigateTo("/clientes");
+}

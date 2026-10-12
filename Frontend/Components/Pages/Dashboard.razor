@@ -1,0 +1,47 @@
+@page "/dashboard"
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>Dashboard | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>Visão geral</h1><p>Acompanhe os principais dados dos seus aluguéis e vendas.</p></div><button class="btn btn-primary" @onclick="NovoAluguel">+ Novo aluguel</button></div>
+    @if (!string.IsNullOrWhiteSpace(erro)) { <div class="alert alert-error">@erro</div> }
+    @if (carregando) { <div class="loading-card">Carregando indicadores...</div> }
+    else {
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon blue">👥</div><div><span>Total de clientes</span><strong>@clientes.Count</strong><small>Clientes cadastrados</small></div></div>
+            <div class="stat-card"><div class="stat-icon purple">📡</div><div><span>Aluguéis ativos</span><strong>@vendas.Count(v => v.DataFimAluguel.HasValue && v.Status == StatusVenda.Ativa)</strong><small>Contratos de aluguel</small></div></div>
+            <div class="stat-card"><div class="stat-icon green">💰</div><div><span>Valor total ativo</span><strong>@Moeda(vendas.Where(v => v.Status == StatusVenda.Ativa).Sum(v => v.Valor))</strong><small>Contratos ativos, valor bruto</small></div></div>
+            <div class="stat-card"><div class="stat-icon orange">⏱</div><div><span>Encerrando em 7 dias</span><strong>@vendas.Count(v => v.DataFimAluguel.HasValue && v.Status == StatusVenda.Ativa && v.DataFimAluguel.Value.Date >= DateTime.Today && v.DataFimAluguel.Value.Date <= DateTime.Today.AddDays(7))</strong><small>Aluguéis próximos do fim</small></div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-header"><div><h3>Registros recentes</h3><p>Últimos aluguéis e vendas cadastrados.</p></div><a class="link" href="/alugueis">Ver aluguéis</a></div>
+            <div class="table-container"><table><thead><tr><th>ID</th><th>Cliente</th><th>Tipo</th><th>Valor</th><th>Início</th><th>Fim</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+                @foreach (var item in vendas.OrderByDescending(v => v.DataVenda).Take(5)) { <tr><td>#@item.Id.ToString("D6")</td><td>@(item.Cliente?.Nome ?? NomeCliente(item.ClienteId))</td><td>@Tipo(item)</td><td>@Moeda(item.Valor)</td><td>@Data(item.DataInicioAluguel)</td><td>@(item.DataFimAluguel.HasValue ? Data(item.DataFimAluguel.Value) : "—")</td><td><span class="status @ClasseStatus(item.Status)">@TextoStatus(item.Status)</span></td><td><button class="btn btn-small" @onclick="() => AbrirDetalhes(item.Id)">Detalhes</button></td></tr> }
+                @if (vendas.Count == 0) { <tr><td colspan="8" class="empty-cell">Ainda não há registros cadastrados.</td></tr> }
+            </tbody></table></div>
+        </div>
+    }
+</section>
+@code {
+    private List<ClienteDto> clientes = [];
+    private List<VendaDto> vendas = [];
+    private bool carregando = true;
+    private string erro = "";
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsAuthenticated) { Nav.NavigateTo("/login"); return; }
+        try { clientes = await Service.GetClientesAsync(); vendas = await Service.GetVendasAsync(); }
+        catch (Exception ex) { erro = ex.Message; }
+        finally { carregando = false; }
+    }
+    private void NovoAluguel() => Nav.NavigateTo("/alugueis/novo");
+    private void AbrirDetalhes(int id) => Nav.NavigateTo($"/contratos/{id}");
+    private string NomeCliente(int id) => clientes.FirstOrDefault(c => c.Id == id)?.Nome ?? $"Cliente #{id}";
+    private static string Tipo(VendaDto v) => v.DataFimAluguel.HasValue ? "Aluguel" : "Venda";
+    private static string Moeda(decimal v) => v.ToString("C", CultureInfo.GetCultureInfo("pt-BR"));
+    private static string Data(DateTime d) => d.ToString("dd/MM/yyyy");
+    private static string TextoStatus(StatusVenda s) => s switch { StatusVenda.Ativa => "Ativa", StatusVenda.Finalizada => "Finalizada", _ => "Cancelada" };
+    private static string ClasseStatus(StatusVenda s) => s switch { StatusVenda.Ativa => "active", StatusVenda.Finalizada => "finished", _ => "cancelled" };
+}

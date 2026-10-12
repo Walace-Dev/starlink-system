@@ -1,0 +1,36 @@
+@page "/clientes"
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>Clientes | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>Clientes</h1><p>Gerencie os clientes cadastrados no sistema.</p></div><button class="btn btn-primary" @onclick="Novo">+ Novo cliente</button></div>
+    @if (!string.IsNullOrWhiteSpace(mensagem)) { <div class="alert @(erro ? "alert-error" : "alert-success")">@mensagem</div> }
+    <div class="toolbar"><div class="search-box"><span>🔎</span><input type="search" placeholder="Buscar por nome, CPF/CNPJ ou e-mail..." @bind="busca" @bind:event="oninput" /></div><select @bind="filtroDocumento" aria-label="Filtrar documento"><option value="Todos">Todos os documentos</option><option value="CPF">CPF</option><option value="CNPJ">CNPJ</option></select></div>
+    @if (carregando) { <div class="loading-card">Carregando clientes...</div> }
+    else {
+        <div class="content-card"><div class="card-header"><div><h3>Clientes cadastrados</h3><p>@Filtrados.Count cliente(s) encontrado(s).</p></div></div>
+        <div class="table-container"><table><thead><tr><th>Cliente</th><th>E-mail</th><th>Telefone</th><th>CPF/CNPJ</th><th>Endereço</th><th>Ações</th></tr></thead><tbody>
+        @foreach (var c in Filtrados) { <tr><td><div class="client-cell"><div class="avatar small">@Iniciais(c.Nome)</div><div><strong>@c.Nome</strong><small>Cadastro @c.DataCadastro.ToLocalTime().ToString("dd/MM/yyyy")</small></div></div></td><td>@(string.IsNullOrWhiteSpace(c.Email) ? "—" : c.Email)</td><td>@(string.IsNullOrWhiteSpace(c.Telefone) ? "—" : c.Telefone)</td><td>@FormatarDocumento(c.Documento)</td><td>@(string.IsNullOrWhiteSpace(c.Endereco) ? "—" : c.Endereco)</td><td><div class="action-group"><button class="btn btn-small" @onclick="() => Editar(c.Id)">Editar</button><button class="btn btn-small btn-danger-outline" @onclick="() => ExcluirAsync(c)">Excluir</button></div></td></tr> }
+        @if (Filtrados.Count == 0) { <tr><td colspan="6" class="empty-cell">Nenhum cliente corresponde à pesquisa.</td></tr> }
+        </tbody></table></div></div>
+    }
+</section>
+@code {
+    private List<ClienteDto> clientes = [];
+    private string busca = "";
+    private string filtroDocumento = "Todos";
+    private string mensagem = "";
+    private bool erro;
+    private bool carregando = true;
+    private List<ClienteDto> Filtrados => clientes.Where(c => (string.IsNullOrWhiteSpace(busca) || $"{c.Nome} {c.Documento} {c.Email} {c.Telefone}".Contains(busca, StringComparison.OrdinalIgnoreCase)) && (filtroDocumento == "Todos" || (filtroDocumento == "CPF" ? Digitos(c.Documento).Length == 11 : Digitos(c.Documento).Length == 14))).ToList();
+    protected override async Task OnInitializedAsync() { if (!Session.IsAuthenticated) { Nav.NavigateTo("/login"); return; } await CarregarAsync(); }
+    private async Task CarregarAsync() { try { clientes = await Service.GetClientesAsync(); } catch (Exception ex) { mensagem = ex.Message; erro = true; } finally { carregando = false; } }
+    private void Novo() => Nav.NavigateTo("/clientes/novo");
+    private void Editar(int id) => Nav.NavigateTo($"/clientes/editar/{id}");
+    private async Task ExcluirAsync(ClienteDto c) { try { await Service.DeleteClienteAsync(c.Id); clientes.RemoveAll(x => x.Id == c.Id); mensagem = $"Cliente {c.Nome} excluído."; erro = false; } catch (Exception ex) { mensagem = ex.Message; erro = true; } }
+    private static string Iniciais(string nome) => string.Concat(nome.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => char.ToUpperInvariant(x[0])));
+    private static string Digitos(string? s) => new((s ?? "").Where(char.IsDigit).ToArray());
+    private static string FormatarDocumento(string? s) { var d = Digitos(s); if (d.Length == 11) return Convert.ToUInt64(d).ToString(@"000\.000\.000\-00"); if (d.Length == 14) return d[..2] + "." + d.Substring(2,3) + "." + d.Substring(5,3) + "/" + d.Substring(8,4) + "-" + d[12..]; return s ?? "—"; }
+}

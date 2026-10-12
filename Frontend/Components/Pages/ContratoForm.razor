@@ -1,0 +1,54 @@
+@page "/alugueis/novo"
+@page "/vendas/nova"
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>@(EhVenda ? "Nova venda" : "Novo aluguel") | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>@(EhVenda ? "Nova venda" : "Novo aluguel")</h1><p>Preencha os dados para cadastrar o registro.</p></div><button class="btn btn-secondary" @onclick="Voltar">← Voltar</button></div>
+    @if (!string.IsNullOrWhiteSpace(erro)) { <div class="alert alert-error">@erro</div> }
+    @if (carregando) { <div class="loading-card">Carregando clientes...</div> }
+    else if (clientes.Count == 0) { <div class="content-card padded"><h3>Cadastre um cliente primeiro</h3><p>Para criar um aluguel ou uma venda, é necessário ter ao menos um cliente cadastrado.</p><button class="btn btn-primary" @onclick="NovoCliente">Cadastrar cliente</button></div> }
+    else {
+        <div class="form-card"><EditForm Model="model" OnValidSubmit="SalvarAsync" FormName="ContratoForm">
+            <input type="hidden" name="__formname" value="ContratoForm" /><DataAnnotationsValidator />
+            <div class="form-section"><h3>Dados do registro</h3><div class="form-grid">
+                <div class="form-group span-2"><label for="cliente">Cliente *</label><InputSelect id="cliente" class="form-input" @bind-Value="model.ClienteId"><option value="0">Selecione um cliente</option>@foreach (var c in clientes) { <option value="@c.Id">#@c.Id · @c.Nome — @c.Documento</option> }</InputSelect><ValidationMessage For="@(() => model.ClienteId)" /></div>
+                <div class="form-group"><label for="valor">Valor (R$) *</label><InputNumber id="valor" class="form-input" @bind-Value="model.Valor" step="0.01" min="0.01" /><ValidationMessage For="@(() => model.Valor)" /></div>
+                <div class="form-group"><label for="inicio">Data de início *</label><InputDate id="inicio" class="form-input" @bind-Value="model.DataInicioAluguel" /></div>
+                @if (!EhVenda) { <div class="form-group"><label for="fim">Data de fim *</label><InputDate id="fim" class="form-input" @bind-Value="model.DataFimAluguel" /><small class="field-hint">A data final deve ser igual ou posterior ao início.</small></div> }
+                <div class="form-group span-2"><label for="obs">Observações</label><InputTextArea id="obs" class="form-input textarea-input" @bind-Value="model.Observacao" placeholder="Informações adicionais (opcional)" /></div>
+            </div></div>
+            <div class="form-section"><h3>Status inicial</h3><div class="form-grid"><div class="form-group"><label for="status">Status</label><InputSelect id="status" class="form-input" @bind-Value="model.Status"><option value="Ativa">Ativa</option><option value="Finalizada">Finalizada</option><option value="Cancelada">Cancelada</option></InputSelect></div></div></div>
+            <div class="form-actions"><button type="button" class="btn btn-secondary" @onclick="Voltar">Cancelar</button><button type="submit" class="btn btn-primary" disabled="@salvando">@(salvando ? "Salvando..." : EhVenda ? "Registrar venda" : "Criar aluguel")</button></div>
+        </EditForm></div>
+    }
+</section>
+@code {
+    private VendaDto model = new() { DataInicioAluguel = DateTime.Today, DataFimAluguel = DateTime.Today.AddMonths(1), Status = StatusVenda.Ativa };
+    private List<ClienteDto> clientes = [];
+    private string erro = "";
+    private bool carregando = true;
+    private bool salvando;
+    private bool EhVenda => Nav.ToBaseRelativePath(Nav.Uri).TrimEnd('/').StartsWith("vendas", StringComparison.OrdinalIgnoreCase);
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsAuthenticated) { Nav.NavigateTo("/login"); return; }
+        try { clientes = await Service.GetClientesAsync(); } catch (Exception ex) { erro = ex.Message; }
+        if (EhVenda) model.DataFimAluguel = null;
+        carregando = false;
+    }
+    private async Task SalvarAsync()
+    {
+        erro = "";
+        if (!EhVenda && !model.DataFimAluguel.HasValue) { erro = "Informe a data de fim do aluguel."; return; }
+        if (model.DataFimAluguel.HasValue && model.DataFimAluguel.Value.Date < model.DataInicioAluguel.Date) { erro = "A data de fim não pode ser anterior à data de início."; return; }
+        salvando = true;
+        try { var venda = await Service.CreateVendaAsync(model); Nav.NavigateTo($"/contratos/{venda.Id}"); }
+        catch (Exception ex) { erro = ex.Message; }
+        finally { salvando = false; }
+    }
+    private void Voltar() => Nav.NavigateTo(EhVenda ? "/vendas" : "/alugueis");
+    private void NovoCliente() => Nav.NavigateTo("/clientes/novo");
+}

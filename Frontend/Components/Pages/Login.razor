@@ -1,0 +1,41 @@
+@page "/"
+@page "/login"
+@layout EmptyLayout
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+@inject IConfiguration Config
+
+<PageTitle>Entrar | StarLink Rental</PageTitle>
+<section class="login-page">
+    <div class="login-card">
+        <div class="brand brand-center"><div class="brand-icon">S</div><div><strong>StarLink</strong><span>Rental</span></div></div>
+        <div class="login-header"><h1>Bem-vindo</h1><p>Entre na sua conta para continuar.</p></div>
+        <EditForm Model="model" OnValidSubmit="EntrarAsync" FormName="LoginForm">
+            <input type="hidden" name="__formname" value="LoginForm" />
+            <DataAnnotationsValidator />
+            <div class="form-group"><label for="email">E-mail</label><InputText id="email" class="form-input" type="email" @bind-Value="model.Email" placeholder="seu@email.com" /><ValidationMessage For="@(() => model.Email)" /></div>
+            <div class="form-group"><div class="label-row"><label for="senha">Senha</label><a href="/registrar">Criar conta</a></div><InputText id="senha" class="form-input" type="password" @bind-Value="model.Senha" placeholder="Digite sua senha" /><ValidationMessage For="@(() => model.Senha)" /></div>
+            @if (!string.IsNullOrWhiteSpace(erro)) { <div class="alert alert-error">@erro</div> }
+            <button type="submit" class="btn btn-primary btn-full" disabled="@carregando">@(carregando ? "Entrando..." : "Entrar")</button>
+        </EditForm>
+        @if (Config.GetValue<bool>("UseMockData"))
+        {
+            <div class="demo-box"><strong>Acesso de demonstração</strong><span>E-mail: admin@starlink.local</span><span>Senha: 123456</span><small>Os dados são fictícios e ficam apenas em memória.</small></div>
+        }
+        <p class="login-footer">Sistema de gerenciamento Starlink</p>
+    </div>
+</section>
+@code {
+    private LoginRequest model = new();
+    private string erro = "";
+    private bool carregando;
+    protected override void OnInitialized() { if (Session.IsAuthenticated) Nav.NavigateTo("/dashboard"); }
+    private async Task EntrarAsync()
+    {
+        carregando = true; erro = "";
+        try { await Service.LoginAsync(model); Nav.NavigateTo("/dashboard"); }
+        catch (Exception ex) { erro = ex.Message; }
+        finally { carregando = false; }
+    }
+}

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>StarLink Rental</title>
+
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+
+    <!-- ============================= -->
+    <!-- LOGIN -->
+    <!-- ============================= -->
+
+    <section class="login-page">
+
+        <div class="login-card">
+
+            <div class="brand brand-center">
+                <div class="brand-icon">S</div>
+
+                <div>
+                    <strong>StarLink</strong>
+                    <span>Rental</span>
+                </div>
+            </div>
+
+            <div class="login-header">
+                <h1>Bem-vindo</h1>
+                <p>Entre na sua conta para continuar.</p>
+            </div>
+
+            <form>
+
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group">
+
+                    <div class="label-row">
+                        <label for="senha">Senha</label>
+
+                        <a href="#">
+                            Esqueci minha senha
+                        </a>
+                    </div>
+
+                    <input
+                        id="senha"
+                        type="password"
+                        placeholder="Digite sua senha">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    Entrar
+                </button>
+
+            </form>
+
+            <div class="login-message success">
+                Login realizado com sucesso.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- SISTEMA -->
+    <!-- ============================= -->
+
+    <div class="app">
+
+        <!-- MENU LATERAL -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    S
+                </div>
+
+                <div>
+                    <strong>StarLink</strong>
+                    <span>Rental</span>
+                </div>
+
+            </div>
+
+            <nav class="sidebar-menu">
+
+                <a href="#" class="menu-item active">
+                    <span>⌂</span>
+                    Dashboard
+                </a>
+
+                <a href="#" class="menu-item">
+                    <span>👥</span>
+                    Clientes
+                </a>
+
+                <a href="#" class="menu-item">
+                    <span>📡</span>
+                    Aluguéis
+                </a>
+
+                <a href="#" class="menu-item">
+                    <span>💰</span>
+                    Vendas
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <a href="#" class="menu-item">
+                    <span>⚙</span>
+                    Configurações
+                </a>
+
+                <a href="#" class="menu-item logout">
+                    <span>↪</span>
+                    Sair
+                </a>
+
+            </div>
+
+        </aside>
+
+
+        <!-- CONTEÚDO -->
+
+        <main class="main-content">
+
+            <!-- HEADER -->
+
+            <header class="topbar">
+
+                <button class="mobile-menu">
+                    ☰
+                </button>
+
+                <div>
+                    <h2>Dashboard</h2>
+                    <span class="breadcrumb">
+                        Visão geral do sistema
+                    </span>
+                </div>
+
+                <div class="user-area">
+
+                    <div class="notification">
+                        🔔
+                        <span>3</span>
+                    </div>
+
+                    <div class="user">
+
+                        <div class="avatar">
+                            NG
+                        </div>
+
+                        <div>
+                            <strong>Administrador</strong>
+                            <small>Administrador</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- DASHBOARD -->
+
+            <section class="page">
+
+                <div class="page-header">
+
+                    <div>
+                        <h1>Visão geral</h1>
+                        <p>
+                            Acompanhe os principais dados dos seus aluguéis.
+                        </p>
+                    </div>
+
+                    <button class="btn btn-primary">
+                        + Novo aluguel
+                    </button>
+
+                </div>
+
+
+                <!-- CARDS -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon blue">
+                            👥
+                        </div>
+
+                        <div>
+                            <span>Total de clientes</span>
+                            <strong>248</strong>
+                            <small>+12 este mês</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon purple">
+                            📡
+                        </div>
+
+                        <div>
+                            <span>Aluguéis ativos</span>
+                            <strong>87</strong>
+                            <small>Equipamentos alugados</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon green">
+                            💰
+                        </div>
+
+                        <div>
+                            <span>Receita mensal</span>
+                            <strong>R$ 18.450,00</strong>
+                            <small>+8,4% este mês</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon orange">
+                            ⏱
+                        </div>
+
+                        <div>
+                            <span>Aluguéis encerrando</span>
+                            <strong>12</strong>
+                            <small>Nos próximos 7 dias</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ALUGUÉIS RECENTES -->
+
+                <div class="content-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>Aluguéis recentes</h3>
+                            <p>Últimos contratos cadastrados.</p>
+                        </div>
+
+                        <a href="#" class="link">
+                            Ver todos
+                        </a>
+
+                    </div>
+
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Valor</th>
+                                    <th>Início</th>
+                                    <th>Fim</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+
+                                    <td>#000124</td>
+
+                                    <td>
+                                        <div class="client-cell">
+
+                                            <div class="avatar small">
+                                                JS
+                                            </div>
+
+                                            <div>
+                                                <strong>
+                                                    João da Silva
+                                                </strong>
+
+                                                <small>
+                                                    123.456.789-00
+                                                </small>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        R$ 250,00
+                                    </td>
+
+                                    <td>
+                                        01/10/2026
+                                    </td>
+
+                                    <td>
+                                        01/11/2026
+                                    </td>
+
+                                    <td>
+                                        <span class="status active">
+                                            Ativo
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <button class="action-btn">
+                                            ⋮
+                                        </button>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>#000123</td>
+
+                                    <td>
+
+                                        <div class="client-cell">
+
+                                            <div class="avatar small">
+                                                MS
+                                            </div>
+
+                                            <div>
+                                                <strong>
+                                                    Maria Santos
+                                                </strong>
+
+                                                <small>
+                                                    987.654.321-00
+                                                </small>
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+                                    <td>
+                                        R$ 300,00
+                                    </td>
+
+                                    <td>
+                                        28/09/2026
+                                    </td>
+
+                                    <td>
+                                        28/10/2026
+                                    </td>
+
+                                    <td>
+                                        <span class="status pending">
+                                            Pendente
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <button class="action-btn">
+                                            ⋮
+                                        </button>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>#000122</td>
+
+                                    <td>
+
+                                        <div class="client-cell">
+
+                                            <div class="avatar small">
+                                                AC
+                                            </div>
+
+                                            <div>
+                                                <strong>
+                                                    Antônio Costa
+                                                </strong>
+
+                                                <small>
+                                                    456.789.123-00
+                                                </small>
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+                                    <td>
+                                        R$ 200,00
+                                    </td>
+
+                                    <td>
+                                        20/09/2026
+                                    </td>
+
+                                    <td>
+                                        20/10/2026
+                                    </td>
+
+                                    <td>
+                                        <span class="status finished">
+                                            Encerrado
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <button class="action-btn">
+                                            ⋮
+                                        </button>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- TELA DE CLIENTES -->
+    <!-- ===================================== -->
+
+    <section class="page example-page">
+
+        <div class="page-header">
+
+            <div>
+                <h1>Clientes</h1>
+
+                <p>
+                    Gerencie os clientes cadastrados no sistema.
+                </p>
+            </div>
+
+            <button class="btn btn-primary">
+                + Novo cliente
+            </button>
+
+        </div>
+
+
+        <div class="toolbar">
+
+            <div class="search-box">
+                🔎
+
+                <input
+                    type="text"
+                    placeholder="Buscar por nome, CPF ou e-mail...">
+            </div>
+
+            <select>
+                <option>Todos</option>
+                <option>CPF</option>
+                <option>CNPJ</option>
+            </select>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>E-mail</th>
+                            <th>Telefone</th>
+                            <th>CPF/CNPJ</th>
+                            <th>Endereço</th>
+                            <th>Ações</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>#001</td>
+
+                            <td>
+                                <strong>João da Silva</strong>
+                            </td>
+
+                            <td>
+                                joao@email.com
+                            </td>
+
+                            <td>
+                                (69) 99999-9999
+                            </td>
+
+                            <td>
+                                123.456.789-00
+                            </td>
+
+                            <td>
+                                Porto Velho - RO
+                            </td>
+
+                            <td>
+                                <button class="btn btn-small">
+                                    Editar
+                                </button>
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================== -->
+    <!-- CADASTRO DE CLIENTE -->
+    <!-- ===================================== -->
+
+    <section class="page example-page">
+
+        <div class="page-header">
+
+            <div>
+                <h1>Novo cliente</h1>
+
+                <p>
+                    Preencha os dados para cadastrar um novo cliente.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="form-card">
+
+            <div class="form-section">
+
+                <h3>Dados pessoais</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group span-2">
+
+                        <label>Nome completo</label>
+
+                        <input
+                            type="text"
+                            placeholder="Digite o nome completo">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>E-mail</label>
+
+                        <input
+                            type="email"
+                            placeholder="cliente@email.com">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Telefone</label>
+
+                        <input
+                            type="text"
+                            placeholder="(00) 00000-0000">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>CPF/CNPJ</label>
+
+                        <input
+                            type="text"
+                            placeholder="Digite o CPF ou CNPJ">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <h3>Endereço</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group span-2">
+
+                        <label>Endereço</label>
+
+                        <input
+                            type="text"
+                            placeholder="Rua, avenida...">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Número</label>
+
+                        <input
+                            type="text"
+                            placeholder="Número">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Complemento</label>
+
+                        <input
+                            type="text"
+                            placeholder="Apartamento, sala...">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button class="btn btn-secondary">
+                    Cancelar
+                </button>
+
+                <button class="btn btn-primary">
+                    Salvar cliente
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================== -->
+    <!-- CRIAÇÃO DE ALUGUEL -->
+    <!-- ===================================== -->
+
+    <section class="page example-page">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>Novo aluguel</h1>
+
+                <p>
+                    Cadastre um novo contrato de aluguel.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-card">
+
+            <div class="form-section">
+
+                <h3>Dados do aluguel</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group span-2">
+
+                        <label>Cliente</label>
+
+                        <select>
+
+                            <option>
+                                Selecione um cliente
+                            </option>
+
+                            <option>
+                                #001 - João da Silva
+                            </option>
+
+                            <option>
+                                #002 - Maria Santos
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Valor</label>
+
+                        <div class="input-money">
+
+                            <span>R$</span>
+
+                            <input
+                                type="number"
+                                placeholder="0,00">
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Data de início</label>
+
+                        <input
+                            type="date">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Data de fim</label>
+
+                        <input
+                            type="date">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <h3>Status</h3>
+
+                <div class="status-selector">
+
+                    <label class="status-option">
+
+                        <input
+                            type="radio"
+                            name="status"
+                            checked>
+
+                        <span class="status active">
+                            Ativo
+                        </span>
+
+                    </label>
+
+
+                    <label class="status-option">
+
+                        <input
+                            type="radio"
+                            name="status">
+
+                        <span class="status pending">
+                            Pendente
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button class="btn btn-secondary">
+                    Cancelar
+                </button>
+
+                <button class="btn btn-primary">
+                    Criar aluguel
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================== -->
+    <!-- DETALHES DO ALUGUEL -->
+    <!-- ===================================== -->
+
+    <section class="page example-page">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>Aluguel #000124</h1>
+
+                <p>
+                    Detalhes do contrato de aluguel.
+                </p>
+
+            </div>
+
+            <span class="status active">
+                Ativo
+            </span>
+
+        </div>
+
+
+        <div class="details-grid">
+
+            <div class="content-card">
+
+                <div class="card-header">
+                    <h3>Informações do aluguel</h3>
+                </div>
+
+                <div class="details-list">
+
+                    <div>
+                        <span>ID</span>
+                        <strong>#000124</strong>
+                    </div>
+
+                    <div>
+                        <span>Valor</span>
+                        <strong>R$ 250,00</strong>
+                    </div>
+
+                    <div>
+                        <span>Data de início</span>
+                        <strong>01/10/2026</strong>
+                    </div>
+
+                    <div>
+                        <span>Data de fim</span>
+                        <strong>01/11/2026</strong>
+                    </div>
+
+                    <div>
+                        <span>Status</span>
+                        <span class="status active">
+                            Ativo
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <div class="card-header">
+                    <h3>Cliente</h3>
+                </div>
+
+                <div class="client-profile">
+
+                    <div class="avatar large">
+                        JS
+                    </div>
+
+                    <h3>
+                        João da Silva
+                    </h3>
+
+                    <p>
+                        joao@email.com
+                    </p>
+
+                    <p>
+                        (69) 99999-9999
+                    </p>
+
+                    <p>
+                        CPF: 123.456.789-00
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="content-card status-card">
+
+            <div>
+
+                <h3>Atualizar status</h3>
+
+                <p>
+                    Altere o status atual deste aluguel.
+                </p>
+
+            </div>
+
+            <select>
+
+                <option value="ATIVO">
+                    Ativo
+                </option>
+
+                <option value="PENDENTE">
+                    Pendente
+                </option>
+
+                <option value="ENCERRADO">
+                    Encerrado
+                </option>
+
+                <option value="CANCELADO">
+                    Cancelado
+                </option>
+
+            </select>
+
+            <button class="btn btn-primary">
+                Atualizar status
+            </button>
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>

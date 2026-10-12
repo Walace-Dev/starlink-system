@@ -1,0 +1,69 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<div class="app">
+    <aside class="sidebar @(mobileOpen ? "mobile-open" : "")">
+        <div class="brand">
+            <div class="brand-icon">S</div>
+            <div><strong>StarLink</strong><span>Rental</span></div>
+        </div>
+        <nav class="sidebar-menu">
+            <NavLink href="/dashboard" class="menu-item" Match="NavLinkMatch.All" @onclick="CloseMobile"><span>⌂</span> Dashboard</NavLink>
+            <NavLink href="/clientes" class="menu-item" @onclick="CloseMobile"><span>👥</span> Clientes</NavLink>
+            <NavLink href="/alugueis" class="menu-item" @onclick="CloseMobile"><span>📡</span> Aluguéis</NavLink>
+            <NavLink href="/vendas" class="menu-item" @onclick="CloseMobile"><span>💰</span> Vendas</NavLink>
+        </nav>
+        <div class="sidebar-bottom">
+            <NavLink href="/configuracoes" class="menu-item" @onclick="CloseMobile"><span>⚙</span> Configurações</NavLink>
+            <button class="menu-item logout menu-button" @onclick="Sair"><span>↪</span> Sair</button>
+        </div>
+    </aside>
+    @if (mobileOpen) { <button class="mobile-scrim" aria-label="Fechar menu" @onclick="CloseMobile"></button> }
+    <main class="main-content">
+        <header class="topbar">
+            <button class="mobile-menu" @onclick="ToggleMobile" aria-label="Abrir menu">☰</button>
+            <div><h2>@Titulo</h2><span class="breadcrumb">@Subtitulo</span></div>
+            <div class="user-area">
+                @if (Session.IsDemo) { <span class="demo-pill">MODO DEMONSTRAÇÃO</span> }
+                <div class="user"><div class="avatar">@Iniciais(Session.Nome)</div><div><strong>@Session.Nome</strong><small>@Session.Email</small></div></div>
+            </div>
+        </header>
+        @Body
+    </main>
+</div>
+
+@code {
+    private bool mobileOpen;
+    private string Titulo => NavigationManagerPath() switch
+    {
+        "clientes" or "clientes/novo" => "Clientes",
+        var p when p.StartsWith("clientes/editar") => "Editar cliente",
+        var p when p.StartsWith("alugueis") => "Aluguéis",
+        var p when p.StartsWith("vendas") => "Vendas",
+        var p when p.StartsWith("contratos/") => "Detalhes do contrato",
+        "configuracoes" => "Configurações",
+        _ => "Dashboard"
+    };
+    private string Subtitulo => Titulo switch
+    {
+        "Clientes" or "Editar cliente" => "Gerencie os clientes cadastrados",
+        "Aluguéis" => "Acompanhe contratos de aluguel",
+        "Vendas" => "Gerencie as vendas de equipamentos",
+        "Detalhes do contrato" => "Informações e status do registro",
+        "Configurações" => "Preferências e ambiente da aplicação",
+        _ => "Visão geral do sistema"
+    };
+    private string NavigationManagerPath() => Nav.ToBaseRelativePath(Nav.Uri).TrimEnd('/').ToLowerInvariant();
+    private static string Iniciais(string? nome)
+    {
+        if (string.IsNullOrWhiteSpace(nome)) return "S";
+        return string.Concat(nome.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => char.ToUpperInvariant(p[0])));
+    }
+    private void ToggleMobile() => mobileOpen = !mobileOpen;
+    private void CloseMobile() => mobileOpen = false;
+    private void Sair() { Session.SignOut(); Nav.NavigateTo("/login"); }
+    protected override void OnInitialized() => Session.Changed += StateHasChanged;
+    public void Dispose() => Session.Changed -= StateHasChanged;
+}
