@@ -75,7 +75,7 @@ Quando o responsável finalizar e configurar o banco:
 - A API enviada tem o modelo `Venda` com `DataInicioAluguel` e `DataFimAluguel`; por isso o frontend representa aluguel quando há data final e venda quando ela é nula.
 - O enum real do backend é `Ativa`, `Finalizada` e `Cancelada`. A interface usa esses valores, em vez de status que não existem no backend.
 - O frontend usa Blazor Interactive Server e não precisa de JavaScript próprio para as funções entregues.
-- A chave JWT do `Backend/appsettings.json` neste pacote é apenas de desenvolvimento. Troque-a por um segredo seguro antes de qualquer implantação real.
+- A chave JWT não é versionada no `Backend/appsettings.json`. Configure `Jwt:Key` localmente com User Secrets ou `Jwt__Key` como variável de ambiente em hospedagem.
 - O ambiente de geração não tinha o SDK `dotnet`, então não foi possível executar `dotnet build` aqui. Abra a solução com o SDK .NET 10 instalado e confira o build inicial; caso o Visual Studio indique algum erro de compilação específico, envie a mensagem para corrigirmos.
 
 
@@ -132,3 +132,9 @@ Branches de trabalho:
 - `chore/nome-da-tarefa`
 
 Depois da configuração inicial do repositório, mudanças devem entrar em `develop` por Pull Request. A promoção para `main` também deve ocorrer por Pull Request.
+
+## Integração contínua
+
+O workflow `.github/workflows/dotnet-ci.yml` roda em Pull Requests para `develop` e `main` e em pushes nessas branches. Ele restaura as dependências e compila toda a solução .NET 10 no modo Release.
+
+**Limitação atual:** a solução ainda não contém projeto de testes automatizados. A aprovação na CI comprova a compilação, não o funcionamento das regras de negócio. O próximo avanço recomendado é criar testes de API e adicioná-los ao workflow.
