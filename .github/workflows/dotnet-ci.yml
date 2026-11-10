@@ -39,3 +39,12 @@ jobs:
 
       - name: Executar testes automatizados
         run: dotnet test Tests/Starlink.Api.Tests/Starlink.Api.Tests.csproj --configuration Release --no-build
+
+      - name: Restaurar ferramentas EF Core
+        run: dotnet tool restore
+
+      - name: Aplicar migrations em SQLite temporario
+        run: dotnet tool run dotnet-ef database update --project Backend/Starlink.Api.csproj --startup-project Backend/Starlink.Api.csproj
+
+      - name: Verificar integridade do banco
+        run: python3 scripts/verify_database.py Backend/starlink.db

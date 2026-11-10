@@ -17,8 +17,20 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
+// Resolve o SQLite relativo na pasta Backend, independentemente de onde
+// o comando dotnet run foi iniciado. Em produção, é possível apontar para
+// um volume persistente usando um caminho absoluto na connection string.
+var databaseConnection = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection ausente.");
+
+var backendDirectory = SqliteDatabaseLocation.BackendDirectory(
+    builder.Environment.ContentRootPath);
+
+databaseConnection = SqliteDatabaseLocation.Resolve(
+    databaseConnection, backendDirectory);
+
 builder.Services.AddDbContext<StarlinkDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(databaseConnection));
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
     ?? throw new InvalidOperationException("Configuração 'Jwt' ausente em appsettings.json.");

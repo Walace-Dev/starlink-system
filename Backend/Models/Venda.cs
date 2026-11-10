@@ -11,7 +11,7 @@ public enum StatusVenda
     Cancelada
 }
 
-public class Venda
+public class Venda : IValidatableObject
 {
     public int Id { get; set; }
 
@@ -39,4 +39,21 @@ public class Venda
     public string? Observacao { get; set; }
 
     public StatusVenda Status { get; set; } = StatusVenda.Ativa;
+    // Validação de negócio aplicada pelo ASP.NET Core aos DTOs recebidos.
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Valor <= 0)
+            yield return new ValidationResult(
+                "O valor precisa ser maior que zero.", new[] { nameof(Valor) });
+
+        if (DataInicioAluguel == default)
+            yield return new ValidationResult(
+                "Informe a data inicial.", new[] { nameof(DataInicioAluguel) });
+
+        if (DataFimAluguel is DateTime fim && fim < DataInicioAluguel)
+            yield return new ValidationResult(
+                "A data final não pode ser anterior à data inicial.",
+                new[] { nameof(DataFimAluguel) });
+    }
+
 }
