@@ -70,9 +70,10 @@ public class DatabaseMigrationsTests
         });
 
         var exception = Assert.Throws<DbUpdateException>(() => db.SaveChanges());
+        Assert.NotNull(exception.InnerException);
         Assert.Contains(
             "Cliente nao pertence ao dono da venda",
-            exception.InnerException?.Message);
+            exception.InnerException.Message);
     }
 
     private static StarlinkDbContext CreateContext(SqliteConnection connection)
