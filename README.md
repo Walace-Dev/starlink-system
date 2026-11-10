@@ -138,3 +138,34 @@ Depois da configuração inicial do repositório, mudanças devem entrar em `dev
 O workflow `.github/workflows/dotnet-ci.yml` roda em Pull Requests para `develop` e `main` e em pushes nessas branches. Ele restaura as dependências e compila toda a solução .NET 10 no modo Release.
 
 **Limitação atual:** a solução ainda não contém projeto de testes automatizados. A aprovação na CI comprova a compilação, não o funcionamento das regras de negócio. O próximo avanço recomendado é criar testes de API e adicioná-los ao workflow.
+
+## Banco de dados (entrega do Projeto de Extensão)
+
+O banco relacional do backend usa **SQLite + Entity Framework Core 10**, com
+migrations versionadas. O arquivo `Backend/starlink.db` é **local, persistente
+e ignorado pelo Git**. Não o envie para o repositório.
+
+No PowerShell, da raiz da solução:
+
+```powershell
+.\scripts\setup-database.ps1
+```
+
+O script restaura a ferramenta EF, faz backup de um SQLite já existente
+(com a API parada), aplica somente migrations pendentes e mantém os dados.
+Para inspecionar a integridade, com Python 3 instalado:
+
+```powershell
+py -3 scripts/verify_database.py Backend/starlink.db
+```
+
+- [Modelagem, dicionário e operação do banco](docs/BANCO_DE_DADOS.md)
+- [Panorama funcional para o relatório acadêmico](docs/PANORAMA_FUNCIONAL.md)
+
+Para utilizar dados persistentes no Blazor, inicie a API, altere
+`Frontend/appsettings.json` para `"UseMockData": false` e mantenha
+`ApiBaseUrl` apontando para a API. Essa alteração deve ser feita em
+configuração de desenvolvimento, sem confundir com produção.
+
+**Deploy:** o SQLite requer armazenamento persistente. Não armazene o
+arquivo em sistemas de arquivos efêmeros de funções serverless.
