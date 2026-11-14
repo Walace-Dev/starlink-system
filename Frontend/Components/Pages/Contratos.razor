@@ -8,7 +8,7 @@
 <section class="page">
     <div class="page-header"><div><h1>@(EhVenda ? "Vendas" : "Aluguéis")</h1><p>@(EhVenda ? "Gerencie as vendas de equipamentos Starlink." : "Acompanhe contratos, períodos e status dos aluguéis.")</p></div><button class="btn btn-primary" @onclick="Novo">+ @(EhVenda ? "Nova venda" : "Novo aluguel")</button></div>
     @if (!string.IsNullOrWhiteSpace(mensagem)) { <div class="alert @(erro ? "alert-error" : "alert-success")">@mensagem</div> }
-    <div class="toolbar"><div class="search-box"><span>🔎</span><input type="search" placeholder="Buscar por cliente ou ID..." @bind="busca" @bind:event="oninput" /></div><select @bind="filtroStatus" aria-label="Filtrar por status"><option value="Todos">Todos os status</option><option value="Ativa">Ativa</option><option value="Finalizada">Finalizada</option><option value="Cancelada">Cancelada</option></select></div>
+    <div class="toolbar"><div class="search-box"><span><Icon Name="search" Size="18" /></span><input type="search" placeholder="Buscar por cliente ou ID..." @bind="busca" @bind:event="oninput" /></div><select @bind="filtroStatus" aria-label="Filtrar por status"><option value="Todos">Todos os status</option><option value="Ativa">Ativa</option><option value="Finalizada">Finalizada</option><option value="Cancelada">Cancelada</option></select></div>
     @if (carregando) { <div class="loading-card">Carregando registros...</div> }
     else {
         <div class="content-card"><div class="card-header"><div><h3>@(EhVenda ? "Vendas registradas" : "Contratos de aluguel")</h3><p>@Filtrados.Count registro(s) encontrado(s).</p></div></div>

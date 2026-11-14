@@ -1,0 +1,108 @@
+@page "/relatorios"
+@inject IStarlinkService Service
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>Relatórios | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>Relatórios</h1><p>Resumo financeiro e operacional calculado a partir dos aluguéis e vendas cadastrados.</p></div><a class="btn btn-secondary" href="/dashboard">← Voltar ao dashboard</a></div>
+    @if (!string.IsNullOrWhiteSpace(erro)) { <div class="alert alert-error">@erro</div> }
+    @if (carregando) { <div class="loading-card">Calculando indicadores...</div> }
+    else
+    {
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon green"><Icon Name="wallet" Size="22" /></div><div><span>Receita registrada</span><strong>@Moeda(Receita)</strong><small>Exclui registros cancelados</small></div></div>
+            <div class="stat-card"><div class="stat-icon blue"><Icon Name="chart" Size="22" /></div><div><span>Ticket médio</span><strong>@Moeda(TicketMedio)</strong><small>Valor médio por registro</small></div></div>
+            <div class="stat-card"><div class="stat-icon purple"><Icon Name="signal" Size="22" /></div><div><span>Registros ativos</span><strong>@Quantidade(StatusVenda.Ativa)</strong><small>De @vendas.Count no total</small></div></div>
+            <div class="stat-card"><div class="stat-icon orange"><Icon Name="clock" Size="22" /></div><div><span>Cancelamentos</span><strong>@Percentual(Quantidade(StatusVenda.Cancelada))%</strong><small>@Quantidade(StatusVenda.Cancelada) registro(s) cancelado(s)</small></div></div>
+        </div>
+
+        <div class="report-grid">
+            <div class="content-card">
+                <div class="card-header"><div><h3>Receita por mês de início</h3><p>Últimos 6 meses, considerando a data de início de cada registro.</p></div></div>
+                <div class="bar-chart">
+                    @foreach (var m in Meses())
+                    {
+                        <div class="bar-col">
+                            <span class="bar-value">@Moeda(m.Valor)</span>
+                            <div class="bar-track"><div class="bar" style="height:@(m.Altura)%"></div></div>
+                            <span class="bar-label">@m.Rotulo</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="content-card">
+                <div class="card-header"><div><h3>Situação dos registros</h3><p>Distribuição por status e por tipo.</p></div></div>
+                <div class="meter-list">
+                    <div class="meter-row"><div class="meter-top"><span>Ativas</span><span>@Quantidade(StatusVenda.Ativa) · @Percentual(Quantidade(StatusVenda.Ativa))%</span></div><div class="meter"><i class="green" style="width:@(Percentual(Quantidade(StatusVenda.Ativa)))%"></i></div></div>
+                    <div class="meter-row"><div class="meter-top"><span>Finalizadas</span><span>@Quantidade(StatusVenda.Finalizada) · @Percentual(Quantidade(StatusVenda.Finalizada))%</span></div><div class="meter"><i class="gray" style="width:@(Percentual(Quantidade(StatusVenda.Finalizada)))%"></i></div></div>
+                    <div class="meter-row"><div class="meter-top"><span>Canceladas</span><span>@Quantidade(StatusVenda.Cancelada) · @Percentual(Quantidade(StatusVenda.Cancelada))%</span></div><div class="meter"><i class="red" style="width:@(Percentual(Quantidade(StatusVenda.Cancelada)))%"></i></div></div>
+                    <div class="meter-row"><div class="meter-top"><span>Aluguéis</span><span>@TotalAlugueis · @Percentual(TotalAlugueis)%</span></div><div class="meter"><i style="width:@(Percentual(TotalAlugueis))%"></i></div></div>
+                    <div class="meter-row"><div class="meter-top"><span>Vendas</span><span>@(vendas.Count - TotalAlugueis) · @Percentual(vendas.Count - TotalAlugueis)%</span></div><div class="meter"><i style="width:@(Percentual(vendas.Count - TotalAlugueis))%"></i></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-header"><div><h3>Clientes com maior valor registrado</h3><p>Top 5, sem contar registros cancelados.</p></div><a class="link" href="/clientes">Ver clientes</a></div>
+            <div class="rank-list">
+                @{ var ranking = TopClientes(); }
+                @for (var i = 0; i < ranking.Count; i++)
+                {
+                    <div class="rank-row"><span class="rank-pos">@(i + 1)</span><div><strong>@ranking[i].Nome</strong><small>@ranking[i].Qtd registro(s)</small></div><strong>@Moeda(ranking[i].Total)</strong></div>
+                }
+                @if (ranking.Count == 0) { <div class="rank-row"><div><small>Ainda não há registros para compor o ranking.</small></div></div> }
+            </div>
+        </div>
+    }
+</section>
+@code {
+    private sealed record MesBarra(string Rotulo, decimal Valor, int Altura);
+    private sealed record ClienteRanking(string Nome, decimal Total, int Qtd);
+
+    private List<ClienteDto> clientes = [];
+    private List<VendaDto> vendas = [];
+    private bool carregando = true;
+    private string erro = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsAuthenticated) { Nav.NavigateTo("/login"); return; }
+        try { clientes = await Service.GetClientesAsync(); vendas = await Service.GetVendasAsync(); }
+        catch (Exception ex) { erro = ex.Message; }
+        finally { carregando = false; }
+    }
+
+    private List<VendaDto> Validas => vendas.Where(v => v.Status != StatusVenda.Cancelada).ToList();
+    private decimal Receita => Validas.Sum(v => v.Valor);
+    private decimal TicketMedio => Validas.Count == 0 ? 0m : Validas.Average(v => v.Valor);
+    private int TotalAlugueis => vendas.Count(v => v.DataFimAluguel.HasValue);
+    private int Quantidade(StatusVenda status) => vendas.Count(v => v.Status == status);
+    private int Percentual(int parte) => vendas.Count == 0 ? 0 : (int)Math.Round(parte * 100.0 / vendas.Count);
+
+    private List<MesBarra> Meses()
+    {
+        var validas = Validas;
+        var pt = CultureInfo.GetCultureInfo("pt-BR");
+        var primeiroDia = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        var meses = new List<(DateTime Mes, decimal Valor)>();
+        for (var i = 5; i >= 0; i--)
+        {
+            var mes = primeiroDia.AddMonths(-i);
+            var total = validas.Where(v => v.DataInicioAluguel.Year == mes.Year && v.DataInicioAluguel.Month == mes.Month).Sum(v => v.Valor);
+            meses.Add((mes, total));
+        }
+        var maximo = meses.Max(x => x.Valor);
+        return meses.Select(x => new MesBarra(x.Mes.ToString("MMM", pt), x.Valor, maximo <= 0 ? 0 : (int)Math.Round((double)(x.Valor / maximo) * 100))).ToList();
+    }
+
+    private List<ClienteRanking> TopClientes() => Validas
+        .GroupBy(v => v.ClienteId)
+        .Select(g => new ClienteRanking(NomeCliente(g.Key), g.Sum(v => v.Valor), g.Count()))
+        .OrderByDescending(x => x.Total)
+        .Take(5)
+        .ToList();
+
+    private string NomeCliente(int id) => clientes.FirstOrDefault(c => c.Id == id)?.Nome ?? $"Cliente #{id}";
+    private static string Moeda(decimal v) => v.ToString("C", CultureInfo.GetCultureInfo("pt-BR"));
+}

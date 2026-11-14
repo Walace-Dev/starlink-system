@@ -7,9 +7,15 @@
 @inject IConfiguration Config
 
 <PageTitle>Entrar | StarLink Rental</PageTitle>
-<section class="login-page">
+<section class="login-page auth-split">
+    <aside class="auth-art">
+        <div class="brand"><div class="brand-icon"><Icon Name="logo" Size="22" /></div><div><strong>StarLink</strong><span>Rental</span></div></div>
+        <div class="auth-copy"><h2>Internet por satélite, sob controle.</h2><p>Gerencie clientes, aluguéis e vendas de equipamentos em um só lugar.</p></div>
+        <div class="auth-points"><span><Icon Name="shield" Size="16" /> Acesso seguro</span><span><Icon Name="signal" Size="16" /> Aluguéis</span><span><Icon Name="chart" Size="16" /> Relatórios</span></div>
+    </aside>
+    <div class="auth-panel">
     <div class="login-card">
-        <div class="brand brand-center"><div class="brand-icon">S</div><div><strong>StarLink</strong><span>Rental</span></div></div>
+        <div class="brand brand-center"><div class="brand-icon"><Icon Name="logo" Size="22" /></div><div><strong>StarLink</strong><span>Rental</span></div></div>
         <div class="login-header"><h1>Bem-vindo</h1><p>Entre na sua conta para continuar.</p></div>
         <EditForm Model="model" OnValidSubmit="EntrarAsync" FormName="LoginForm">
             <input type="hidden" name="__formname" value="LoginForm" />
@@ -24,6 +30,7 @@
             <div class="demo-box"><strong>Acesso de demonstração</strong><span>E-mail: admin@starlink.local</span><span>Senha: 123456</span><small>Os dados são fictícios e ficam apenas em memória.</small></div>
         }
         <p class="login-footer">Sistema de gerenciamento Starlink</p>
+    </div>
     </div>
 </section>
 @code {
