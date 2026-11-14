@@ -6,9 +6,15 @@
 @inject IConfiguration Config
 
 <PageTitle>Criar conta | StarLink Rental</PageTitle>
-<section class="login-page">
+<section class="login-page auth-split">
+    <aside class="auth-art">
+        <div class="brand"><div class="brand-icon"><Icon Name="logo" Size="22" /></div><div><strong>StarLink</strong><span>Rental</span></div></div>
+        <div class="auth-copy"><h2>Internet por satélite, sob controle.</h2><p>Gerencie clientes, aluguéis e vendas de equipamentos em um só lugar.</p></div>
+        <div class="auth-points"><span><Icon Name="shield" Size="16" /> Acesso seguro</span><span><Icon Name="signal" Size="16" /> Aluguéis</span><span><Icon Name="chart" Size="16" /> Relatórios</span></div>
+    </aside>
+    <div class="auth-panel">
     <div class="login-card">
-        <div class="brand brand-center"><div class="brand-icon">S</div><div><strong>StarLink</strong><span>Rental</span></div></div>
+        <div class="brand brand-center"><div class="brand-icon"><Icon Name="logo" Size="22" /></div><div><strong>StarLink</strong><span>Rental</span></div></div>
         <div class="login-header"><h1>Criar conta</h1><p>Cadastre o responsável pela conta.</p></div>
         <EditForm Model="model" OnValidSubmit="RegistrarAsync" FormName="RegistrarForm">
             <input type="hidden" name="__formname" value="RegistrarForm" />
@@ -21,6 +27,7 @@
         </EditForm>
         @if (Config.GetValue<bool>("UseMockData")) { <p class="demo-note">No modo demonstração, a conta existe somente durante a sessão atual.</p> }
         <p class="login-footer"><a href="/login">Já tenho uma conta · Voltar ao login</a></p>
+    </div>
     </div>
 </section>
 @code {

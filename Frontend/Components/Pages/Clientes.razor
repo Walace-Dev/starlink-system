@@ -7,7 +7,7 @@
 <section class="page">
     <div class="page-header"><div><h1>Clientes</h1><p>Gerencie os clientes cadastrados no sistema.</p></div><button class="btn btn-primary" @onclick="Novo">+ Novo cliente</button></div>
     @if (!string.IsNullOrWhiteSpace(mensagem)) { <div class="alert @(erro ? "alert-error" : "alert-success")">@mensagem</div> }
-    <div class="toolbar"><div class="search-box"><span>🔎</span><input type="search" placeholder="Buscar por nome, CPF/CNPJ ou e-mail..." @bind="busca" @bind:event="oninput" /></div><select @bind="filtroDocumento" aria-label="Filtrar documento"><option value="Todos">Todos os documentos</option><option value="CPF">CPF</option><option value="CNPJ">CNPJ</option></select></div>
+    <div class="toolbar"><div class="search-box"><span><Icon Name="search" Size="18" /></span><input type="search" placeholder="Buscar por nome, CPF/CNPJ ou e-mail..." @bind="busca" @bind:event="oninput" /></div><select @bind="filtroDocumento" aria-label="Filtrar documento"><option value="Todos">Todos os documentos</option><option value="CPF">CPF</option><option value="CNPJ">CNPJ</option></select></div>
     @if (carregando) { <div class="loading-card">Carregando clientes...</div> }
     else {
         <div class="content-card"><div class="card-header"><div><h3>Clientes cadastrados</h3><p>@Filtrados.Count cliente(s) encontrado(s).</p></div></div>

@@ -1,0 +1,27 @@
+@page "/ajuda"
+@inject AuthSession Session
+@inject NavigationManager Nav
+
+<PageTitle>Ajuda | StarLink Rental</PageTitle>
+<section class="page">
+    <div class="page-header"><div><h1>Ajuda</h1><p>Como usar o sistema em quatro passos e respostas para as dúvidas mais comuns.</p></div></div>
+    <div class="steps">
+        <div class="step"><span class="step-num">01</span><h3>Cadastre o cliente</h3><p>Em Clientes, informe nome e CPF/CNPJ. O documento é validado e não pode se repetir.</p></div>
+        <div class="step"><span class="step-num">02</span><h3>Registre o contrato</h3><p>Crie um aluguel, com datas de início e fim, ou uma venda, que não tem data final.</p></div>
+        <div class="step"><span class="step-num">03</span><h3>Acompanhe</h3><p>O dashboard mostra contratos ativos, valor total e aluguéis que terminam em até 7 dias.</p></div>
+        <div class="step"><span class="step-num">04</span><h3>Atualize o status</h3><p>Nos detalhes do registro, marque como Ativa, Finalizada ou Cancelada.</p></div>
+    </div>
+    <div class="content-card">
+        <div class="card-header"><div><h3>Perguntas frequentes</h3><p>Baseadas no funcionamento atual do sistema.</p></div></div>
+        <div class="faq">
+            <details><summary>Como o sistema diferencia aluguel de venda?</summary><p>Pela data final. Um registro com data de fim é tratado como aluguel; sem data de fim, como venda.</p></details>
+            <details><summary>Quais status um registro pode ter?</summary><p>Ativa, Finalizada ou Cancelada. O status pode ser alterado a qualquer momento na tela de detalhes.</p></details>
+            <details><summary>Por que não consigo excluir um cliente?</summary><p>Clientes que já possuem aluguéis ou vendas registradas não podem ser excluídos. Exclua antes os registros vinculados a ele e tente novamente.</p></details>
+            <details><summary>O que é o modo demonstração?</summary><p>É um modo de teste com dados fictícios guardados apenas em memória, sem banco de dados. Ao reiniciar a aplicação, os dados voltam ao estado inicial. O modo atual aparece em Configurações.</p></details>
+            <details><summary>Outro usuário consegue ver os meus clientes?</summary><p>Não. Cada conta enxerga apenas os clientes e registros que ela mesma cadastrou.</p></details>
+        </div>
+    </div>
+</section>
+@code {
+    protected override void OnInitialized() { if (!Session.IsAuthenticated) Nav.NavigateTo("/login"); }
+}

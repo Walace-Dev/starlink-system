@@ -1,0 +1,53 @@
+<svg class="icon" width="@Size" height="@Size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    @switch (Name)
+    {
+        case "logo":
+            <circle cx="12" cy="12" r="2.3" fill="currentColor" stroke="none" />
+            <ellipse cx="12" cy="12" rx="9.5" ry="4" transform="rotate(-30 12 12)" />
+            break;
+        case "home":
+            <path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M10 20v-6h4v6" />
+            break;
+        case "users":
+            <circle cx="9" cy="8" r="3.2" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><circle cx="17" cy="9" r="2.4" /><path d="M17 14c2.5 0 4.5 2 4.5 5" />
+            break;
+        case "signal":
+            <circle cx="12" cy="12" r="1.6" /><path d="M8.5 8.5a5 5 0 0 0 0 7" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M5.7 5.7a9 9 0 0 0 0 12.6" /><path d="M18.3 5.7a9 9 0 0 1 0 12.6" />
+            break;
+        case "wallet":
+            <rect x="3" y="6" width="18" height="13" rx="2.5" /><path d="M3 10h18" /><circle cx="16.5" cy="14.5" r="1" />
+            break;
+        case "chart":
+            <path d="M4 20V4" /><path d="M4 20h16" /><path d="M8 16v-5" /><path d="M12 16V8" /><path d="M16 16v-3" />
+            break;
+        case "help":
+            <circle cx="12" cy="12" r="9" /><path d="M9.6 9.3a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8" /><path d="M12 17h.01" />
+            break;
+        case "settings":
+            <circle cx="12" cy="12" r="3" /><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" />
+            break;
+        case "logout":
+            <path d="M9 4H5v16h4" /><path d="M16 8l4 4-4 4" /><path d="M20 12H9" />
+            break;
+        case "search":
+            <circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2" />
+            break;
+        case "clock":
+            <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+            break;
+        case "menu":
+            <path d="M4 7h16M4 12h16M4 17h16" />
+            break;
+        case "plus":
+            <path d="M12 5v14M5 12h14" />
+            break;
+        case "shield":
+            <path d="M12 3l7.5 3v5.5c0 4.5-3 8-7.5 9.5-4.5-1.5-7.5-5-7.5-9.5V6z" /><path d="M9 12l2 2 4-4" />
+            break;
+    }
+</svg>
+
+@code {
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public int Size { get; set; } = 20;
+}

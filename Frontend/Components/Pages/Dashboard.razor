@@ -5,15 +5,18 @@
 
 <PageTitle>Dashboard | StarLink Rental</PageTitle>
 <section class="page">
-    <div class="page-header"><div><h1>Visão geral</h1><p>Acompanhe os principais dados dos seus aluguéis e vendas.</p></div><button class="btn btn-primary" @onclick="NovoAluguel">+ Novo aluguel</button></div>
+    <div class="hero">
+        <div><span class="eyebrow">@(string.IsNullOrWhiteSpace(Session.Nome) ? "Bem-vindo" : "Olá, " + Session.Nome)</span><h1>Visão geral</h1><p>Acompanhe os principais dados dos seus aluguéis e vendas.</p></div>
+        <div class="hero-actions"><button class="btn btn-primary" @onclick="NovoAluguel"><Icon Name="plus" Size="16" /> Novo aluguel</button><a class="btn btn-secondary" href="/relatorios">Ver relatórios</a></div>
+    </div>
     @if (!string.IsNullOrWhiteSpace(erro)) { <div class="alert alert-error">@erro</div> }
     @if (carregando) { <div class="loading-card">Carregando indicadores...</div> }
     else {
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-icon blue">👥</div><div><span>Total de clientes</span><strong>@clientes.Count</strong><small>Clientes cadastrados</small></div></div>
-            <div class="stat-card"><div class="stat-icon purple">📡</div><div><span>Aluguéis ativos</span><strong>@vendas.Count(v => v.DataFimAluguel.HasValue && v.Status == StatusVenda.Ativa)</strong><small>Contratos de aluguel</small></div></div>
-            <div class="stat-card"><div class="stat-icon green">💰</div><div><span>Valor total ativo</span><strong>@Moeda(vendas.Where(v => v.Status == StatusVenda.Ativa).Sum(v => v.Valor))</strong><small>Contratos ativos, valor bruto</small></div></div>
-            <div class="stat-card"><div class="stat-icon orange">⏱</div><div><span>Encerrando em 7 dias</span><strong>@vendas.Count(v => v.DataFimAluguel.HasValue && v.Status == StatusVenda.Ativa && v.DataFimAluguel.Value.Date >= DateTime.Today && v.DataFimAluguel.Value.Date <= DateTime.Today.AddDays(7))</strong><small>Aluguéis próximos do fim</small></div></div>
+            <div class="stat-card"><div class="stat-icon blue"><Icon Name="users" Size="22" /></div><div><span>Total de clientes</span><strong>@clientes.Count</strong><small>Clientes cadastrados</small></div></div>
+            <div class="stat-card"><div class="stat-icon purple"><Icon Name="signal" Size="22" /></div><div><span>Aluguéis ativos</span><strong>@vendas.Count(v => v.DataFimAluguel.HasValue && v.Status == StatusVenda.Ativa)</strong><small>Contratos de aluguel</small></div></div>
+            <div class="stat-card"><div class="stat-icon green"><Icon Name="wallet" Size="22" /></div><div><span>Valor total ativo</span><strong>@Moeda(vendas.Where(v => v.Status == StatusVenda.Ativa).Sum(v => v.Valor))</strong><small>Contratos ativos, valor bruto</small></div></div>
+            <div class="stat-card"><div class="stat-icon orange"><Icon Name="clock" Size="22" /></div><div><span>Encerrando em 7 dias</span><strong>@vendas.Count(v => v.DataFimAluguel.HasValue && v.Status == StatusVenda.Ativa && v.DataFimAluguel.Value.Date >= DateTime.Today && v.DataFimAluguel.Value.Date <= DateTime.Today.AddDays(7))</strong><small>Aluguéis próximos do fim</small></div></div>
         </div>
         <div class="content-card">
             <div class="card-header"><div><h3>Registros recentes</h3><p>Últimos aluguéis e vendas cadastrados.</p></div><a class="link" href="/alugueis">Ver aluguéis</a></div>

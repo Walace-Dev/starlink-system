@@ -6,24 +6,28 @@
 <div class="app">
     <aside class="sidebar @(mobileOpen ? "mobile-open" : "")">
         <div class="brand">
-            <div class="brand-icon">S</div>
+            <div class="brand-icon"><Icon Name="logo" Size="22" /></div>
             <div><strong>StarLink</strong><span>Rental</span></div>
         </div>
         <nav class="sidebar-menu">
-            <NavLink href="/dashboard" class="menu-item" Match="NavLinkMatch.All" @onclick="CloseMobile"><span>⌂</span> Dashboard</NavLink>
-            <NavLink href="/clientes" class="menu-item" @onclick="CloseMobile"><span>👥</span> Clientes</NavLink>
-            <NavLink href="/alugueis" class="menu-item" @onclick="CloseMobile"><span>📡</span> Aluguéis</NavLink>
-            <NavLink href="/vendas" class="menu-item" @onclick="CloseMobile"><span>💰</span> Vendas</NavLink>
+            <div class="menu-label">Principal</div>
+            <NavLink href="/dashboard" class="menu-item" Match="NavLinkMatch.All" @onclick="CloseMobile"><span><Icon Name="home" /></span> Dashboard</NavLink>
+            <NavLink href="/clientes" class="menu-item" @onclick="CloseMobile"><span><Icon Name="users" /></span> Clientes</NavLink>
+            <NavLink href="/alugueis" class="menu-item" @onclick="CloseMobile"><span><Icon Name="signal" /></span> Aluguéis</NavLink>
+            <NavLink href="/vendas" class="menu-item" @onclick="CloseMobile"><span><Icon Name="wallet" /></span> Vendas</NavLink>
+            <div class="menu-label">Análises</div>
+            <NavLink href="/relatorios" class="menu-item" @onclick="CloseMobile"><span><Icon Name="chart" /></span> Relatórios</NavLink>
         </nav>
         <div class="sidebar-bottom">
-            <NavLink href="/configuracoes" class="menu-item" @onclick="CloseMobile"><span>⚙</span> Configurações</NavLink>
-            <button class="menu-item logout menu-button" @onclick="Sair"><span>↪</span> Sair</button>
+            <NavLink href="/ajuda" class="menu-item" @onclick="CloseMobile"><span><Icon Name="help" /></span> Ajuda</NavLink>
+            <NavLink href="/configuracoes" class="menu-item" @onclick="CloseMobile"><span><Icon Name="settings" /></span> Configurações</NavLink>
+            <button class="menu-item logout menu-button" @onclick="Sair"><span><Icon Name="logout" /></span> Sair</button>
         </div>
     </aside>
     @if (mobileOpen) { <button class="mobile-scrim" aria-label="Fechar menu" @onclick="CloseMobile"></button> }
     <main class="main-content">
         <header class="topbar">
-            <button class="mobile-menu" @onclick="ToggleMobile" aria-label="Abrir menu">☰</button>
+            <button class="mobile-menu" @onclick="ToggleMobile" aria-label="Abrir menu"><Icon Name="menu" Size="24" /></button>
             <div><h2>@Titulo</h2><span class="breadcrumb">@Subtitulo</span></div>
             <div class="user-area">
                 @if (Session.IsDemo) { <span class="demo-pill">MODO DEMONSTRAÇÃO</span> }
@@ -44,6 +48,8 @@
         var p when p.StartsWith("vendas") => "Vendas",
         var p when p.StartsWith("contratos/") => "Detalhes do contrato",
         "configuracoes" => "Configurações",
+        "relatorios" => "Relatórios",
+        "ajuda" => "Ajuda",
         _ => "Dashboard"
     };
     private string Subtitulo => Titulo switch
@@ -53,6 +59,8 @@
         "Vendas" => "Gerencie as vendas de equipamentos",
         "Detalhes do contrato" => "Informações e status do registro",
         "Configurações" => "Preferências e ambiente da aplicação",
+        "Relatórios" => "Indicadores calculados a partir dos seus registros",
+        "Ajuda" => "Passo a passo e perguntas frequentes",
         _ => "Visão geral do sistema"
     };
     private string NavigationManagerPath() => Nav.ToBaseRelativePath(Nav.Uri).TrimEnd('/').ToLowerInvariant();
